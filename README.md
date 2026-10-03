@@ -28,7 +28,7 @@ conformal calibration, and nine ordering policies under a protocol locked before
 |-- paper/
 |   |-- main.tex, main.pdf   manuscript (IEEE conference format)
 |   |-- sections/            section sources
-|   |-- tables/, figures/    tables and figures generated from results/
+|   |-- tables/, figures/    tables generated from results/ and the schematic figures
 |   |-- references.bib
 |   `-- scripts/             scripts that regenerate the tables and figures
 |-- scripts/                 small data utilities
@@ -83,16 +83,16 @@ The tables and figures are generated from the saved files in `results/`; no mode
 python -m venv .venv
 .\.venv\Scripts\python -m pip install -r paper\scripts\requirements.txt
 
-.\.venv\Scripts\python paper\scripts\make_exhibits.py         # tables and transfer-gap figure
+.\.venv\Scripts\python paper\scripts\make_exhibits.py         # tables
 .\.venv\Scripts\python paper\scripts\make_diagrams.py         # schematic figures
 .\.venv\Scripts\python paper\scripts\stream_descriptives.py   # dataset counts and hashes (needs data/)
 ```
 
-Build the PDF with [Tectonic](https://tectonic-typesetting.github.io/) or any TeX Live installation:
+Build the PDF with pdfLaTeX, the toolchain IEEE recommends (it embeds Type 1 fonts; Overleaf uses it by default):
 
 ```powershell
 cd paper
-tectonic main.tex        # or: latexmk -pdf main.tex
+latexmk -pdf main.tex    # or: pdflatex main; bibtex main; pdflatex main; pdflatex main
 ```
 
 ## Main results
@@ -104,10 +104,11 @@ tectonic main.tex        # or: latexmk -pdf main.tex
 | Runtime | 1,194.9 s | 4,210.4 s |
 
 On the locked final week of run E, no ordering policy wins under every cost ratio. When shortage costs three
-times as much as a leftover unit, LightGBM demand quantiles with pooled conformal calibration give the lowest
-mean cost among the full-sample policies; when leftovers cost more, a raw-sales LightGBM with residual
-quantiles is cheaper. Evaluating the calibrated policy on a history it was not trained on raises its mean cost
-by at most 0.0472 normalized units. See [docs/results.md](docs/results.md) and the paper for details.
+times as much as a leftover unit, LightGBM demand quantiles with pooled conformal calibration are the cheapest
+full-sample policy in all nine train/test cells; when leftovers cost more, a raw-sales LightGBM with residual
+quantiles is cheapest in all nine. Evaluating the calibrated policy on a history it was not trained on raises its
+mean cost by at most 0.0472 normalized units, the smallest worst case among the policies that read the evaluation
+history. See [docs/results.md](docs/results.md) and the paper for details.
 
 ## Limitations
 

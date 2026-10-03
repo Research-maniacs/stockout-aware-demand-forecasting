@@ -1,4 +1,10 @@
 \documentclass[conference,a4paper]{IEEEtran}
+% IEEE Xplore accepts PDF 1.4 to 1.7; pin 1.5 when building with pdfLaTeX (IEEE's reference toolchain).
+\ifdefined\pdfminorversion\pdfminorversion=5\fi
+% Camera-ready only: uncomment the next two lines and \IEEEpubidadjcol after \maketitle,
+% and replace the placeholder with the copyright line supplied by the conference.
+% \IEEEoverridecommandlockouts
+% \IEEEpubid{\makebox[\columnwidth]{979-8-XXXX-XXXX-X/26/\$31.00~\copyright2026 IEEE\hfill}\hspace{\columnsep}\makebox[\columnwidth]{\hfill}}
 \usepackage{cite}
 \usepackage{amsmath}
 \usepackage{newtxtext,newtxmath}
@@ -40,14 +46,15 @@ Chennai, Tamil Nadu, India}
 \IEEEauthorblockA{\srmaffiliation\\
 {\small shekhawat419shivam@gmail.com}}
 \and
-\IEEEauthorblockN{Dr. G. Premalatha}
+\IEEEauthorblockN{G. Premalatha}
 \IEEEauthorblockA{\srmaffiliation\\
 {\small premalag@srmist.edu.in}}}
 
 \maketitle
+% \IEEEpubidadjcol
 
 \begin{abstract}
-Recorded sales understate demand whenever a product sells out, so models fitted to sales can mislead the ordering decisions they support. We study demand forecasting and newsvendor ordering on FreshRetailNet-50K, a fresh-retail panel with hourly stockout flags. A series-day without a flagged stockout between 06:00 and 21:59 gives an exact, though selected, proxy for demand in that window. Three simulated stockout mechanisms censor these days in different ways, so a model trained on one censored history can be scored on another against the same outcomes. Two independent development runs, on a stratified 5,000-series sample and on all 50,000 series, have nearly equal donor-day shares (0.5580 and 0.5573). A separate end-to-end run on 5,000 series compares nine ordering policies under a protocol locked before the final week was scored. No policy wins under every cost ratio. When a shortage costs three times as much as a leftover unit, LightGBM demand quantiles with pooled conformal calibration give the lowest mean cost among the full-sample policies in every matched history; when leftovers cost more, a raw-sales LightGBM with residual quantiles is cheaper. Evaluating the calibrated policy on a history other than the one it was trained on increases its mean cost by at most 0.0472 normalized units (95\% cluster-bootstrap interval 0.0391--0.0554). For real censored histories, where demand is unobserved, we report only a lower bound on q90 misses.
+Recorded sales understate demand whenever a product sells out, so forecasts and orders fitted to sales inherit the stocking policy. We study demand forecasting and newsvendor ordering on FreshRetailNet-50K, a fresh-retail panel with hourly stockout flags. Days without a flagged stockout give an exact, though selected, proxy for demand. We censor these days with three simulated stockout mechanisms and score every forecast and order against the same uncensored outcomes, so models trained on differently censored histories are compared on identical rows. Earlier evaluations on this dataset score demand recovery and forecast accuracy, or profit measured on censored sales; we score ordering cost against an uncensored proxy and measure transfer between censoring mechanisms. In a 5,000-series run locked before the final week was scored, we compare nine ordering policies under three cost ratios; none wins under every ratio. When a shortage costs three times as much as a leftover unit, LightGBM demand quantiles with pooled conformal calibration are the cheapest full-sample policy in all nine train/test cells; when leftovers cost more, a raw-sales LightGBM with residual quantiles is cheapest in all nine. Training on a different mechanism raises the calibrated policy's mean cost by at most 0.0472 normalized units (95\% cluster-bootstrap interval 0.0391--0.0554), the smallest worst case among the policies that read the evaluation history. For real censored days, where demand is unobserved, we report only a lower bound on misses of the 90\% quantile forecast.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -64,6 +71,8 @@ censored demand, stockouts, demand forecasting, quantile regression, conformal c
 \section*{Acknowledgment}
 \todo{AI-use disclosure required by IEEE (system used, where, and to what extent) and any funding acknowledgments.}
 
+% Balances the two columns on the last page; re-check the number after any edit above.
+\IEEEtriggeratref{8}
 \bibliographystyle{IEEEtran}
 \bibliography{references}
 
