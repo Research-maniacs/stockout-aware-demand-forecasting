@@ -1,0 +1,46 @@
+# Local datasets (train.parquet exceeds GitHub's normal file-size limit).
+/data/*.parquet
+/data/**/*.parquet
+
+# New experiment runs. Curated lightweight evidence under results/ is tracked.
+/frn_outputs/
+/frn_phase5_9_outputs/
+/results/runs/
+
+# Model checkpoints, cloned upstream repositories, and isolated environments.
+*.ckpt
+*.pt
+*.pth
+*.pypots
+**/venv_upstream/
+**/frn-50k-baseline/
+
+# Python and Jupyter.
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# LaTeX build products. Keep source .tex files and paper assets.
+/paper/build/
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.run.xml
+*.synctex.gz
+*.toc
+
+# Editors and operating systems.
+.vscode/settings.json
+.DS_Store
+Thumbs.db
+

@@ -1,0 +1,16 @@
+quantity,value
+train rows (file),4500000
+eval rows (file; schema/row count only),350000
+series in train,50000
+train dates,2024-03-28 .. 2024-06-25 (90 days)
+eval dates,2024-06-26 .. 2024-07-02
+selected series (this run),50000
+selected series-days,4500000
+donor days: model_fit (days 1-60),1630675
+donor days: tuning (61-75),450872
+"donor days: calibration (76-90, counted only)",426447
+donor share overall,0.5573
+Phase 4 train donor rows per mechanism (days 8-60),1440065
+Phase 4 tuning donor rows per mechanism,450872
+simulated eligible donor days per mechanism,2484288
+masked donor days A / B / C,1139664 / 1408663 / 2066155

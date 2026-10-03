@@ -1,0 +1,15 @@
+stage,seconds,peak_rss_GB,ok
+P0 provenance + hashes,0.61,0.287,True
+P0 schema inspection,0.71,0.416,True
+P0 global streaming audit,10.65,1.146,True
+P0 series selection,0.1,0.891,True
+P0 smoke check (10 series),3.62,1.257,True
+P1 load selected panel,13.72,2.296,True
+P1 daily table,3.02,2.511,True
+P1 real-timeline features,11.44,3.605,True
+P1 leakage perturbation test,2.61,2.81,True
+P2 simulator fit (fit dates) + tuning check,85.39,2.677,True
+P2 simulate A/B/C timelines + rebuild features per timeline,84.98,4.984,True
+P3 baselines A/B/C,1869.64,6.11,True
+P3 prediction perturbation test,2.84,3.839,True
+P4 demand quantile models A/B/C x 4 taus,2065.22,5.398,True

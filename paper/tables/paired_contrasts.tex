@@ -1,0 +1,21 @@
+\begin{tabular}{@{}lllrrr@{}}
+\toprule
+Pooled conformal minus & Cost setting & Population & $n$ & Difference & 95\% percentile interval \\
+\midrule
+Uncalibrated demand quantile & Excess stock more costly & Matched full sample & 61,923 & $-0.0052$ & $[-0.0068, -0.0034]$ \\
+Uncalibrated demand quantile & Equal costs & Matched full sample & 61,923 & $-0.0077$ & $[-0.0096, -0.0062]$ \\
+Uncalibrated demand quantile & Shortage more costly & Matched full sample & 61,923 & $-0.0420$ & $[-0.0483, -0.0365]$ \\
+\addlinespace
+Raw-sales LightGBM + residual & Excess stock more costly & Matched full sample & 61,923 & $+0.0208$ & $[0.0016, 0.0432]$ \\
+Raw-sales LightGBM + residual & Equal costs & Matched full sample & 61,923 & $-0.0091$ & $[-0.0204, 0.0052]$ \\
+Raw-sales LightGBM + residual & Shortage more costly & Matched full sample & 61,923 & $-0.0790$ & $[-0.0946, -0.0615]$ \\
+\addlinespace
+Seasonal naive + residual & Excess stock more costly & Matched full sample & 61,923 & $-0.1213$ & $[-0.1465, -0.0876]$ \\
+Seasonal naive + residual & Equal costs & Matched full sample & 61,923 & $-0.0694$ & $[-0.0872, -0.0439]$ \\
+Seasonal naive + residual & Shortage more costly & Matched full sample & 61,923 & $-0.1376$ & $[-0.1723, -0.0902]$ \\
+\addlinespace
+Kaplan--Meier percentile & Excess stock more costly & KM-supported rows & 61,523 & $-0.4043$ & $[-0.4276, -0.3824]$ \\
+Kaplan--Meier percentile & Equal costs & KM-supported rows & 58,183 & $-0.3223$ & $[-0.3429, -0.3046]$ \\
+Kaplan--Meier percentile & Shortage more costly & KM-supported rows & 47,294 & $-0.7475$ & $[-0.8175, -0.6812]$ \\
+\bottomrule
+\end{tabular}

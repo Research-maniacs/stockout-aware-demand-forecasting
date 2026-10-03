@@ -1,0 +1,20 @@
+\begin{tabular}{@{}llrrrr@{}}
+\toprule
+ & & & \multicolumn{3}{c}{Mean cost} \\
+\cmidrule(l){4-6}
+Policy & Population & $n$ & $\beta=0.25$ & $\beta=0.50$ & $\beta=0.75$ \\
+\midrule
+\multicolumn{6}{@{}l}{\emph{(a) Full-sample exact-donor candidates}} \\
+Seasonal naive + residual quantile & Full sample & 20,641 & 0.6759 & 0.4430 & 0.7853 \\
+Raw-sales LightGBM + residual quantile & Full sample & 20,641 & \textbf{0.5448} & \textbf{0.3868} & 0.7366 \\
+Raw-sales quantile LightGBM & Full sample & 20,641 & 0.5749 & 0.3999 & 0.7503 \\
+Demand-quantile LightGBM (uncalibrated) & Full sample & 20,641 & 0.5816 & 0.3946 & 0.7152 \\
+Demand-quantile LightGBM + pooled conformal & Full sample & 20,641 & 0.5766 & 0.3891 & \textbf{0.6831} \\
+Kaplan--Meier order percentile & Full sample & 20,641 & 0.8404 & 0.6520 & 1.3878 \\
+Demand-quantile + adaptive calibration (sensitivity) & Full sample & 20,641 & 0.5815 & 0.3932 & 0.6963 \\
+\midrule
+\multicolumn{6}{@{}l}{\emph{(b) Declared deep subset of 600 series (separate population)}} \\
+TFT (direct) + residual quantile & Deep subset & 2,510 & 0.6892 & 0.4949 & 0.9483 \\
+TimesNet$\rightarrow$TFT + residual quantile & Deep subset & 2,510 & \textbf{0.6586} & \textbf{0.4687} & \textbf{0.8759} \\
+\bottomrule
+\end{tabular}

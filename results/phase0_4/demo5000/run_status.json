@@ -1,0 +1,15 @@
+{
+  "run_tag": "demo5000",
+  "completed_all_cells_utc": "2026-09-20T16:49:19Z",
+  "phase_status": {
+    "Phase 0": "PASS",
+    "Phase 1": "PASS",
+    "Phase 2": "PASS",
+    "Phase 3": "PASS",
+    "Phase 4": "PASS"
+  },
+  "failed_checks": [],
+  "n_series": 5000,
+  "total_seconds": 1194.9,
+  "fast_mode": false
+}
