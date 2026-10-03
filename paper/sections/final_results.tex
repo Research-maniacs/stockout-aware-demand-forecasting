@@ -1,12 +1,12 @@
 \section{Locked Final-Week Evaluation}
 \label{sec:final}
 
-The final evaluation scores donor rows only. Each of the nine transfer cells, one per pair of training mechanism and evaluation history, holds the same 20,641 final donor series-dates, and the six full-sample policies other than Kaplan--Meier are scored on all of them. Kaplan--Meier scores only rows with an estimable order, between 6,012 and 20,641 per cell, with the fewest in the C-trained cells when shortage is more costly. The two neural policies score the 2,510 final donor rows of the deep subset, and no predictions are imputed for the remaining 4,400 series. Every table therefore states the population and the number of scored rows, and the neural policies appear in a separate panel.
+The final evaluation scores donor rows only. Each of the nine transfer cells, one per pair of training mechanism and evaluation history, holds the same 20,641 final donor series-dates, and the six full-sample policies other than Kaplan--Meier are scored on all of them. Kaplan--Meier scores only rows with an estimable order, between 6,012 and 20,641 per cell, with the fewest in the C-trained cells when shortage is more costly. The two neural policies score the 2,510 final donor rows of the deep subset, and no predictions are imputed for the remaining 4,400 series. Tables therefore state each policy's population and row count.
 
 \subsection{Policy comparison}
 \label{sec:policies}
 
-Table~\ref{tab:policies} gives the mean costs of the A-trained models on the A history under the three cost settings. The best full-sample policy depends on the cost ratio. When excess stock is more costly, the raw-sales LightGBM with residual quantiles has the lowest mean cost, and it stays lowest at equal costs, narrowly ahead of the pooled-conformal demand quantiles. When shortage is more costly, the pooled-conformal policy has the lowest cost. The B and C histories give the same picture, except that at equal costs the pooled-conformal policy is cheapest on the C history. The Kaplan--Meier percentile is the most expensive full-sample policy in each setting of the table. Within the deep subset, TFT on the TimesNet-recovered history costs less than direct TFT in every matched history and cost setting, a comparison internal to that subset.
+Table~\ref{tab:policies} gives the mean costs of the A-trained models on the A history under the three cost settings. The best full-sample policy depends on the cost ratio. On the A history, the raw-sales LightGBM with residual quantiles has the lowest cost when excess stock is more costly and, narrowly, at equal costs (0.3868 against 0.3891 for pooled conformal); the pooled-conformal policy has the lowest cost when shortage is more costly. The B history gives the same ranking. On the C history the pooled-conformal policy is already the cheaper of the two at equal costs (0.4094 against 0.4411), so averaged over the three matched histories it is cheaper at equal costs (0.3984 against 0.4075), as in Tables~\ref{tab:contrasts} and~\ref{tab:ablations}; the paired interval of that average difference contains zero. The Kaplan--Meier percentile is the most expensive full-sample policy in each setting of the table. Within the deep subset, TFT on the TimesNet-recovered history costs less than direct TFT in every matched history and cost setting, a comparison internal to that subset.
 
 \begin{table*}[t]
 \centering\footnotesize
@@ -35,19 +35,12 @@ Table~\ref{tab:scenarios} shows the pooled-conformal policy in each matched hist
 \input{tables/cost_scenarios}
 \end{table}
 
-Pooled calibration also moves the empirical q90 coverage of the matched final donor rows toward the nominal 0.90 in every history and lowers the q90 pinball loss (Table~\ref{tab:q90}). Coverage stays below nominal. It is measured on selected complete days after the calibration window, so it does not show that exchangeability holds for censored days or would survive a change of stocking policy.
-
-\begin{table}[t]
-\centering\footnotesize\setlength{\tabcolsep}{4pt}
-\caption{q90 Coverage and Pinball Loss on Matched Final Donor Rows}
-\label{tab:q90}
-\input{tables/coverage_q90}
-\end{table}
+Pooled calibration also moves the empirical q90 coverage of the 20,641 matched final donor rows toward the nominal 0.90 in every history, from 0.798--0.828 to 0.879--0.887, and lowers the q90 pinball loss from 0.119--0.131 to 0.109--0.114. Coverage stays below nominal. It is measured on selected complete days after the calibration window, so it does not show that exchangeability holds for censored days or would survive a change of stocking policy.
 
 \subsection{Mechanism transfer}
 \label{sec:transfer}
 
-Table~\ref{tab:transfer} and Fig.~\ref{fig:transfer} fix the pooled-conformal policy at $\beta=0.75$ and vary the history used for training and calibration. The transfer gap
+Table~\ref{tab:transfer} fixes the pooled-conformal policy at $\beta=0.75$ and vary the history used for training and calibration. The transfer gap
 \begin{equation}
 \Delta_{m\to h}=\overline{C}_{m\to h}(\mathcal I)-\overline{C}_{m\to m}(\mathcal I)
 \label{eq:transfer}
@@ -61,14 +54,12 @@ compares the mean cost on an unseen evaluation history $h$ with the matched cost
 \input{tables/transfer}
 \end{table*}
 
-\begin{figure}[t]
-\centering
-\includegraphics[width=\columnwidth]{figures/transfer_gaps.pdf}
-\caption{Transfer gaps of Table~\ref{tab:transfer}. Red cells cost more on the evaluation history than the matched model on its own history; the diagonal is the matched reference.}
-\label{fig:transfer}
-\end{figure}
-
 All intervals are 95\% percentile intervals from 200 cluster-bootstrap replicates~\cite{efron1979bootstrap}. Each replicate resamples the 866 city--store clusters with replacement and keeps every row of a drawn cluster, and both sides of a contrast use the same draws. Dates are not resampled separately and no multiplicity adjustment is applied. With 200 replicates the tail percentiles are approximate, so we read the intervals as descriptive and make no claims of statistical significance.
+
+\subsection{Robustness across cells, dates, and series}
+\label{sec:robust}
+
+The reversal with the cost ratio is not specific to the matched histories. Over all nine train/test cells, the raw-sales LightGBM with residual quantiles is the cheapest full-sample policy in every cell when excess stock is more costly, with the pooled-conformal policy 0.0007 to 0.0323 more expensive; when shortage is more costly, the pooled-conformal policy is the cheapest in every cell, 0.0441 to 0.1298 below the raw-sales policy. At equal costs the cells split: four go to each of the two policies and one to the uncalibrated demand quantiles. Over the three cost settings, the largest transfer gap of the pooled-conformal policy is $+0.0472$, the smallest worst case among the six policies whose forecasts read the evaluation history; the raw-sales quantile LightGBM reaches $+0.2258$. Kaplan--Meier orders do not read that history, so its gaps are zero by construction. Over the seven final dates, with 2,507 to 3,385 donor rows each, the C history is the most expensive on every date in all three cost settings, and the daily q90 coverage of the pooled-conformal models ranges from 0.839 to 0.907. Under-coverage concentrates in series with at most ten complete days in the fit period (q90 coverage 0.752 to 0.769 over 532 rows) and on promotion days (0.854 to 0.865). These breakdowns are descriptive outputs of the same locked run, not pre-specified comparisons, and carry no intervals.
 
 \subsection{Real recorded histories}
 \label{sec:real}

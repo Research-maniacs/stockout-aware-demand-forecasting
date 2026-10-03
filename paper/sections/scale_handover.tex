@@ -1,34 +1,15 @@
-\section{Development Runs: Sample Versus Population}
+\section{Development Runs and Reproducibility}
 \label{sec:scale}
 
-Table~\ref{tab:scale} compares the two standalone Phase~0--4 runs. Run~S tuned hyperparameters fully on 5,000 series; run~P used the fast setting on all 50,000 series. The overall donor share is almost the same in both runs, which suggests that the stratified sample preserves donor availability. Run~P has a lower q50 tuning WAPE for all three mechanisms and a longer runtime. Because the runs differ in tuning mode as well as size, neither difference can be attributed to scale, and the runtimes are not a scaling benchmark. All values in this section come from the tuning window, not the final week. Fit-period donor days outnumber training rows because the first week of history only feeds lag features.
+Table~\ref{tab:scale} compares the two development runs. Run~S searched hyperparameters fully on 5,000 series; run~P used a reduced search on all 50,000 series. The overall donor share is almost the same (0.5580 and 0.5573), so the stratified sample preserves donor availability. Run~P has a lower q50 tuning WAPE for all three mechanisms and a longer runtime, but the runs differ in search mode as well as size, so neither difference can be attributed to scale and the runtimes are not a scaling benchmark. Fit-period donor days outnumber training rows because the first week of history only feeds lag features.
 
 \begin{table}[t]
 \centering\footnotesize
-\caption{Standalone Phase~0--4 Runs (Tuning Window; WAPE as a Ratio)}
+\caption{Development Runs, Phases~0--4 (Tuning Window; WAPE as a Ratio)}
 \label{tab:scale}
 \input{tables/standalone_scale}
 \end{table}
 
-The simulator summaries in Table~\ref{tab:simscale} check the mechanisms themselves. The masked share is the fraction of eligible donor days with at least one simulated stockout hour in the window, and visible/proxy is the recorded sales total after simulation divided by the proxy total. The two runs agree closely for every mechanism, and both show the same ordering: C masks the most days and hides the most sales, A the fewest. The sample is therefore representative for these summaries; the comparison does not show that the joint feature distribution, or any downstream metric, is the same at both scales.
+The simulator summaries agree between the two runs to within 0.001. The masked share, the fraction of eligible donor days with at least one simulated stockout hour in the window, is 0.460, 0.566, and 0.832 for A, B, and C in run~S (0.459, 0.567, and 0.832 in run~P), and the share of proxy sales left visible after simulation is 0.803, 0.718, and 0.474 (0.804, 0.717, and 0.474). The sample is therefore representative for these summaries; this does not show that the joint feature distribution, or any downstream metric, is the same at both scales.
 
-\begin{table}[t]
-\centering\footnotesize
-\caption{Simulator Summaries on Eligible Donor Days, Runs~S and~P}
-\label{tab:simscale}
-\input{tables/sim_comparison}
-\end{table}
-
-\section{Run~E's Own Phase~0--4 Stage}
-\label{sec:handover}
-
-Run~E did not reuse run~S. It executed its own Phase~0--4 stage in the same kernel as its later phases, and its prerequisite audit selected that output (Table~\ref{tab:handover}). At full stored precision its q50 tuning WAPEs equal those of run~S for all three mechanisms, which is consistent with a deterministic pipeline applied to the same data, seed, and sampling rule. The two runs still differ in timestamps, pandas version (3.0.2 in run~S, 2.3.3 in run~E), and file hashes, so we treat them as separate evidence. The Phase~0--4 stage of run~E recorded \texttt{FAST\_MODE=false}; its later phases recorded \texttt{FAST\_MODE=true} and \texttt{RUN\_MODE=FAST}, which selects 200 bootstrap replicates.
-
-\begin{table}[t]
-\centering\footnotesize
-\caption{Run~E's Own Phase~0--4 Stage}
-\label{tab:handover}
-\input{tables/merged_handover}
-\end{table}
-
-One Phase~0 check of run~E remained open: \emph{restart-and-run-all reproduces selected series, split IDs and simulator masks}. The check compares fingerprints with an earlier execution in the same output folder, and on the first execution there was none. All other Phase~0--4 checks passed. Before continuing, the prerequisite audit re-derived the simulator masks and feature matrices from the raw panel, required exact agreement, and verified the hashes of 33 predecessor files; it admitted the predecessor with this one open item. No run hashed the notebook source it executed, so the current notebook files cannot prove which code produced a given result.
+Run~E did not reuse run~S. It executed its own Phase~0--4 stage, with the full hyperparameter search, in the same kernel as its later phases. Its fingerprints of the selected series, the chronological split, and the three simulator masks equal those of run~S, and so do its donor counts and its q50 tuning WAPEs at full stored precision (0.333440, 0.336140, and 0.335759 for A, B, and C). This is consistent with a deterministic pipeline applied to the same data, seed, and sampling rule. The two runs still differ in timestamps, pandas version (3.0.2 in run~S, 2.3.3 in run~E), and file hashes, so we treat them as separate evidence. Within run~E, one Phase~0 check stayed open because it compares fingerprints with an earlier execution in the same output folder, and the first execution has none; the comparison with run~S above is the one it would have made. Before continuing, a prerequisite audit re-derived the simulator masks and feature matrices from the raw panel, required exact agreement, and verified the hashes of 33 predecessor files. Run~E's later phases ran in the reduced mode, which uses 200 bootstrap replicates. No run hashed the notebook source it executed, so the current notebook files cannot prove which code produced a given result.

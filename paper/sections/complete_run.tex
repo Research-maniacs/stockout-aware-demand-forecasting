@@ -1,28 +1,21 @@
-\section{Run~E: Models, Calibration, and the Lock}
+\section{Models, Calibration, and the Protocol Lock}
 \label{sec:complete}
 
-All results from here on come from run~E and its 5,000 series. Its prerequisite audit passed 10 checks. Besides reproducing the simulator masks and features, it confirmed that proxy labels exist only on donor days and match a recomputation, that the calibration and final-week days were unused so far, and that randomizing target-day fields leaves the target-day features unchanged.
+All results from here on come from run~E and its 5,000 series. Its prerequisite audit passed 10 checks, which also confirmed that proxy labels exist only on donor days and match a recomputation and that the calibration and final-week days were still unused.
 
-\subsection{Deep models on a declared subset}
+\subsection{Neural models as budget-limited references}
 \label{sec:deepdev}
 
-The deep models ran on CPU, with two logical CPUs, 8.42~GB of RAM, and four training epochs per model, on a declared subset of 600 series. TimesNet recovers artificially hidden donor hours, and across the three mechanisms it scored 290,397 hidden hours (Table~\ref{tab:deepdev}). TFT forecasts the next day's window total on matched tuning donor days, and its WAPE is lower when it reads the TimesNet-recovered history than when it reads the visible history. The two tasks differ in target, unit, and denominator, and neither WAPE is comparable with the Phase~4 q50 WAPE on the full sample. The final TFT routes reuse 6 trained models; the 24 frozen prediction pipelines combine the direct and recovered variants with the three training mechanisms and four evaluation histories (A, B, C, and the real history).
-
-\begin{table}[t]
-\centering\footnotesize
-\caption{Phase~5 Development Metrics on the 600-Series Deep Subset (WAPE as a Ratio)}
-\label{tab:deepdev}
-\input{tables/phase5_diagnostics}
-\end{table}
+The neural models ran on CPU, with two logical CPUs, 8.42~GB of RAM, and four training epochs per model, on a declared subset of 600 series. This budget makes them reference points rather than tuned competitors, so we compare them only with each other and within the subset, and we draw no conclusion about neural versus tree-based forecasters; tree ensembles are already a strong default for retail sales~\cite{makridakis2022m5}. TimesNet recovers artificially hidden donor hours; across the three mechanisms it scored 290,397 hidden hours with WAPE 0.917 to 0.934. TFT forecasts the next day's window total on 5,407 matched tuning donor days, and its WAPE falls from 0.451--0.453 with the visible history to 0.413--0.415 with the TimesNet-recovered history. The two tasks differ in target, unit, and denominator, and neither WAPE is comparable with the Phase~4 q50 WAPE on the full sample. The final TFT routes reuse 6 trained models; the 24 frozen prediction pipelines combine the direct and recovered variants with the three training mechanisms and four evaluation histories (A, B, C, and the real history).
 
 Our reproduction of the official baseline~\cite{dingdong2025baseline} is partial. The as-documented TimesNet run failed on a blocked network download and completed only after a recorded patch that reads the verified local Parquet files; the upstream TFT training finished, but its prediction step was not run. The task-aligned TimesNet and TFT implementations used in this paper passed their own stage checks.
 
 \subsection{Kaplan--Meier baseline and calibration}
 
-The Kaplan--Meier policy passed all 8 of its unit tests and built 207 pools, each with a recorded support count; its minimum support thresholds were chosen on tuning donors. If a pool cannot support the requested percentile, the order is left unestimated rather than filled in from another policy, so the policy can score fewer rows than the candidate set.
+The Kaplan--Meier policy passed all 8 of its unit tests and built 207 pools, with support thresholds chosen on tuning donors; when a pool cannot support the requested percentile, the order is left unestimated rather than borrowed from another policy.
 
-Calibration used 513,276 residuals from the calibration window, pooled over mechanisms and quantile levels. The fallback share, the fraction of calibration rows corrected from a pool coarser than category by sales tier, was 0.061. Some rows still had crossing quantiles after the correction, and sorting each row's corrected quantiles removed every crossing. Sorting guarantees ordered quantiles, not calibrated ones.
+Calibration used 513,276 calibration-window residuals, pooled over mechanisms and quantile levels; 0.061 of the calibration rows were corrected from a pool coarser than category by sales tier. Sorting each row's corrected quantiles removed every remaining crossing, which guarantees ordered quantiles, not calibrated ones.
 
 \subsection{Ordering policies and the protocol lock}
 
-Nine policies turn forecasts into orders (Table~\ref{tab:policies}). All 10 hand-computed checks of the order and cost arithmetic passed. The Phase~8 lock then fixed the policy names, cost settings, model and calibration files, planned comparisons, and bootstrap settings before Phase~9 read any final-week outcome. The final week has been scored once under this lock, and any revised protocol applied to the same week would be exploratory.
+Nine policies turn forecasts into orders (Table~\ref{tab:policies}). All 10 hand-computed checks of the order and cost arithmetic passed. The protocol lock written in Phase~8 then fixed the policy names, cost settings, model and calibration files, planned comparisons, and bootstrap settings before Phase~9 read any final-week outcome. The final week has been scored once under this lock, and any revised protocol applied to the same week would be exploratory.

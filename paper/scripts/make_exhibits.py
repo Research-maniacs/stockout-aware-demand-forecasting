@@ -1,11 +1,10 @@
-"""Generate the paper tables and the transfer-gap figure from the saved result files.
+"""Generate the paper tables from the saved result files.
 
 Run from the repository root:
 
     python paper/scripts/make_exhibits.py
 
-The script reads results/ only and writes paper/tables/*.tex and paper/figures/transfer_gaps.pdf.
-No model is retrained.
+The script reads results/ only and writes paper/tables/*.tex. No model is retrained.
 """
 from __future__ import annotations
 
@@ -13,29 +12,13 @@ import csv
 import json
 from pathlib import Path
 
-import matplotlib
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt
-import numpy as np
-
-# IEEE PDF checks reject Type 3 fonts; embed TrueType and use a Times-like face.
-matplotlib.rcParams.update({
-    "pdf.fonttype": 42,
-    "ps.fonttype": 42,
-    "font.family": "STIXGeneral",
-    "mathtext.fontset": "stix",
-    "font.size": 8,
-})
-
 ROOT = Path(__file__).resolve().parents[2]
 TABS = ROOT / "paper" / "tables"
-FIGS = ROOT / "paper" / "figures"
 DEMO = ROOT / "results/phase0_4/demo5000"
 FULL = ROOT / "results/phase0_4/full50k"
 MERGED = ROOT / "results/phase0_9_5k/phase0_4"
 LATER = ROOT / "results/phase0_9_5k/phase5_9"
 END = r" \\"
-COLUMN_WIDTH_IN = 3.45  # IEEEtran conference column width is about 3.5 in
 POLICY = "demand-quantile LightGBM + pooled conformal"
 DISPLAY = {
     "seasonal_naive + residual quantile": "Seasonal naive + residual quantile",
@@ -89,11 +72,6 @@ def table(name: str, lines: list[str]) -> None:
     (TABS / name).write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
-def save_figure(fig, name: str) -> None:
-    fig.savefig(FIGS / name, metadata={"CreationDate": None})
-    plt.close(fig)
-
-
 def split() -> None:
     rows = csv_rows(MERGED / "manifests/split_manifest.csv")
     names = {"model_fit": ("Model fit", "model fitting"), "tuning": ("Tuning", "model selection"),
@@ -127,7 +105,7 @@ def scale() -> None:
     lines = [r"\begin{tabular}{@{}lrr@{}}", r"\toprule", "Measure & Run S & Run P" + END, r"\midrule"]
     lines.append(row("Selected series", [count(status[r]["n_series"]) for r in roots]))
     lines.append(count_row("Selected series-days", "selected series-days"))
-    lines.append(row(r"FAST\_MODE (Phases 0--4)", [str(fast[r]).lower() for r in roots]))
+    lines.append(row("Hyperparameter search", ["reduced" if fast[r] else "full" for r in roots]))
     lines.append(count_row("Fit donor days", "donor days: model_fit (days 1-60)"))
     lines.append(count_row("Tuning donor days", "donor days: tuning (61-75)"))
     lines.append(count_row("Calibration donor days", "donor days: calibration (76-90, counted only)"))
@@ -136,54 +114,23 @@ def scale() -> None:
     for mech in "ABC":
         lines.append(row(f"q50 tuning WAPE, {mech}", [f"{float(wape[r][mech]):.4f}" for r in roots]))
     lines.append(row("Runtime (s)", [f"{float(status[r]['total_seconds']):,.1f}" for r in roots]))
-    lines.append(row("Peak RSS (GB)", [f"{max(float(x['peak_rss_GB']) for x in rss[r]):.3f}" for r in roots]))
+    lines.append(row("Peak memory (GB)", [f"{max(float(x['peak_rss_GB']) for x in rss[r]):.3f}" for r in roots]))
     lines += [r"\bottomrule", r"\end{tabular}"]
     table("standalone_scale.tex", lines)
 
-    sims = {root: {r[""]: r for r in csv_rows(root / "sim/simulation_summary.csv")} for root in roots}
-    lines = [r"\begin{tabular}{@{}lrrrr@{}}", r"\toprule",
-             r" & \multicolumn{2}{c}{Masked share} & \multicolumn{2}{c}{Visible/proxy}" + END,
-             r"\cmidrule(lr){2-3}\cmidrule(l){4-5}",
-             "Mechanism & Run S & Run P & Run S & Run P" + END, r"\midrule"]
-    for mech in "ABC":
-        cells = [f"{float(sims[root][metric][mech]):.3f}"
-                 for metric in ("masked share", "visible / proxy total") for root in roots]
-        lines.append(f"{mech} & " + " & ".join(cells) + END)
-    lines += [r"\bottomrule", r"\end{tabular}"]
-    table("sim_comparison.tex", lines)
 
-
-def handover() -> None:
+def check_handover() -> None:
+    """Section III states that run E's own Phase 0-4 stage reproduces run S exactly; check it."""
     w = {r["mechanism"]: r["WAPE"] for r in csv_rows(MERGED / "metrics/phase4_tuning_median_metrics.csv")}
     previous = {r["mechanism"]: r["WAPE"] for r in csv_rows(DEMO / "metrics/phase4_tuning_median_metrics.csv")}
-    # Compare at full stored precision: the paper states that these values are identical.
+    # Compare at full stored precision, not after rounding.
     assert w == previous, "The saved WAPEs are not exactly identical"
-    status = json_obj(MERGED / "run_status.json")
     assert json_obj(MERGED / "manifests/provenance.json")["config"]["FAST_MODE"] is False
-    rss = max(float(r["peak_rss_GB"]) for r in csv_rows(MERGED / "metrics/runtime_memory.csv"))
-    lines = [r"\begin{tabular}{@{}lr@{}}", r"\toprule", "Measure & Run E, Phases 0--4" + END, r"\midrule",
-             f"Selected series & {count(status['n_series'])}" + END,
-             r"FAST\_MODE (Phases 0--4) & false" + END]
-    for m in "ABC":
-        lines.append(f"q50 tuning WAPE, {m} & {float(w[m]):.6f}" + END)
-    lines += [f"Runtime (s) & {float(status['total_seconds']):,.1f}" + END,
-              f"Peak RSS (GB) & {rss:.3f}" + END,
-              r"\bottomrule", r"\end{tabular}"]
-    table("merged_handover.tex", lines)
-
-
-def deep_diagnostics() -> None:
-    lines = [r"\begin{tabular}{@{}lllrr@{}}", r"\toprule",
-             r"Route & Mech. & Scored unit & $n$ & WAPE" + END, r"\midrule"]
-    for r in csv_rows(LATER / "phase5_timesnet_tft/timesnet_recovery_metrics.csv"):
-        lines.append(f"TimesNet recovery & {r['mechanism']} & hidden donor hours "
-                     f"& {count(r['hidden donor hours scored'])} & {float(r['WAPE']):.3f}" + END)
-    lines.append(r"\midrule")
-    for r in csv_rows(LATER / "phase5_timesnet_tft/tft_tuning_development_metrics.csv"):
-        label = "TFT direct" if r["variant"] == "direct" else r"TimesNet$\rightarrow$TFT"
-        lines.append(f"{label} & {r['train_mech']} & tuning donor days & {count(r['n'])} & {float(r['WAPE']):.3f}" + END)
-    lines += [r"\bottomrule", r"\end{tabular}"]
-    table("phase5_diagnostics.tex", lines)
+    counts = [{r["quantity"]: r["value"] for r in csv_rows(root / "metrics/final_summary_counts.csv")} for root in (MERGED, DEMO)]
+    assert counts[0] == counts[1], "Run E's donor counts differ from run S"
+    fingerprints = [json_obj(root / "manifests/repro_fingerprints.json")[-1]["fingerprints"] for root in (MERGED, DEMO)]
+    for key in ("selected_series_sha256", "split_manifest_sha256", "sim_mask_A_sha256", "sim_mask_B_sha256", "sim_mask_C_sha256"):
+        assert fingerprints[0][key] == fingerprints[1][key], f"{key} differs between runs E and S"
 
 
 def policy_panels(lock: dict, orders: list[dict[str, str]]) -> None:
@@ -231,19 +178,6 @@ def cost_scenarios(lock: dict, orders: list[dict[str, str]]) -> None:
     table("cost_scenarios.tex", lines)
 
 
-def coverage() -> None:
-    forecasts = csv_rows(LATER / "phase9_evaluation/final_forecast_metrics.csv")
-    lines = [r"\begin{tabular}{@{}lllrrr@{}}", r"\toprule",
-             "History & Quantile route & Population & $n$ & Coverage & Pinball" + END, r"\midrule"]
-    for mech in "ABC":
-        for calibration in ("uncalibrated", "pooled conformal"):
-            r = one(forecasts, train_mech=mech, test_hist=mech, tau="0.9", calibration=calibration)
-            lines.append(f"{mech} & {calibration.capitalize()} & Full sample & {count(r['n'])} "
-                         f"& {float(r['coverage']):.4f} & {float(r['pinball']):.4f}" + END)
-    lines += [r"\bottomrule", r"\end{tabular}"]
-    table("coverage_q90.tex", lines)
-
-
 def paired_contrasts(lock: dict, boot: list[dict[str, str]]) -> None:
     lines = [r"\begin{tabular}{@{}lllrrr@{}}", r"\toprule",
              r"Pooled conformal minus & Cost setting & Population & $n$ & Difference & 95\% percentile interval" + END,
@@ -269,7 +203,6 @@ def transfer(orders: list[dict[str, str]], boot: list[dict[str, str]]) -> None:
     lines = [r"\begin{tabular}{@{}cclrrrrr@{}}", r"\toprule",
              r"Train & Test history & Population & $n$ & Matched & Unseen & Gap & 95\% percentile interval" + END,
              r"\midrule"]
-    matrix = np.zeros((3, 3))
     for r in gaps:
         a, b = r["train_mech"], r["test_hist"]
         order = one(orders, beta="0.75", policy=POLICY, train_mech=a, test_hist=b)
@@ -277,30 +210,11 @@ def transfer(orders: list[dict[str, str]], boot: list[dict[str, str]]) -> None:
         gap = float(r["cost transfer gap"])
         assert abs(gap - float(ci["point"])) < 1e-9, f"Gap mismatch for {a}->{b}"
         assert int(float(ci["n"])) == int(float(order["n"])), f"Bootstrap n differs from scored n for {a}->{b}"
-        matrix["ABC".index(a), "ABC".index(b)] = gap
         interval = f"[{float(ci['lo']):.4f}, {float(ci['hi']):.4f}]"
         lines.append(f"{a} & {b} & Full sample & {count(order['n'])} & {float(r['matched mean cost']):.4f} "
                      f"& {float(r['unseen mean cost']):.4f} & {math(signed(gap))} & {math(interval)}" + END)
     lines += [r"\bottomrule", r"\end{tabular}"]
     table("transfer.tex", lines)
-
-    fig, ax = plt.subplots(figsize=(COLUMN_WIDTH_IN, 2.35), constrained_layout=True)
-    limit = float(np.max(np.abs(matrix)))
-    image = ax.imshow(matrix, cmap="RdBu_r", vmin=-limit, vmax=limit)
-    ax.set_xticks(range(3), list("ABC"))
-    ax.set_yticks(range(3), list("ABC"))
-    ax.set_xlabel("Evaluation history")
-    ax.set_ylabel("Training and calibration history")
-    for i in range(3):
-        for j in range(3):
-            value = matrix[i, j]
-            label = "matched" if i == j else f"{value:+.3f}".replace("-", "−")
-            color = "white" if abs(value) > 0.6 * limit else "black"
-            ax.text(j, i, label, ha="center", va="center", fontsize=8, color=color)
-    bar = fig.colorbar(image, ax=ax, shrink=0.9)
-    bar.set_label("Mean-cost gap")
-    bar.set_ticks([])
-    save_figure(fig, "transfer_gaps.pdf")
 
 
 def real_history() -> None:
@@ -361,7 +275,6 @@ def ablations() -> None:
 
 def main() -> None:
     TABS.mkdir(parents=True, exist_ok=True)
-    FIGS.mkdir(parents=True, exist_ok=True)
     lock = json_obj(LATER / "manifests/final_test_lock.json")
     orders = csv_rows(LATER / "phase9_evaluation/final_order_metrics.csv")
     boot = csv_rows(LATER / "phase9_evaluation/bootstrap_paired_differences.csv")
@@ -371,16 +284,14 @@ def main() -> None:
     assert lock["n_series"] == 5000 and lock["deep_subsample"] == 600
     split()
     scale()
-    handover()
-    deep_diagnostics()
+    check_handover()
     policy_panels(lock, orders)
     cost_scenarios(lock, orders)
-    coverage()
     paired_contrasts(lock, boot)
     transfer(orders, boot)
     real_history()
     ablations()
-    print(f"Wrote tables to {TABS} and transfer_gaps.pdf to {FIGS}")
+    print(f"Wrote tables to {TABS}")
 
 
 if __name__ == "__main__":
