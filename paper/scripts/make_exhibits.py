@@ -69,7 +69,7 @@ def math(text: str) -> str:
 
 
 def table(name: str, lines: list[str]) -> None:
-    (TABS / name).write_text("\n".join(lines) + "\n", encoding="utf-8")
+    (TABS / name).write_text("\n".join(lines) + "\n", encoding="utf-8", newline="\n")
 
 
 def split() -> None:
@@ -252,13 +252,13 @@ def ablations() -> None:
     evidence = csv_rows(LATER / "metrics/ablation_table.csv")
     # (ablation number, label, values quoted from the result text, scope)
     specifications = [
-        ("1.", "Raw-sales vs demand-quantile", ("0.4075", "0.3984"), "Equal-cost matched cells"),
-        ("2.", "Uncalibrated vs pooled q90 coverage", ("0.8121", "0.8832"), "Final donor proxy; nominal 0.90"),
-        ("5.", "Direct vs recovered-history TFT", ("0.4999", "0.4690"), "Equal-cost deep subset"),
-        ("7.", "Short versus full lag set", (), "Not run after the lock"),
-        ("8.", "Static vs adaptive calibration", ("0.3984", "0.4039"), "Equal-cost sensitivity"),
-        ("9.", "One-day vs two-day inventory", ("0.3984", "0.2579"), "Hypothetical carry-over"),
-        ("10.", "Contract vs oracle-weather WAPE", ("33.48%", "33.40%"), "Target-day oracle; not deployable"),
+        ("1.", r"Raw-sales vs.\ demand-quantile", ("0.4075", "0.3984"), "Equal-cost matched cells"),
+        ("2.", r"Uncalibrated vs.\ pooled q90 coverage", ("0.8121", "0.8832"), "Final donor proxy; nominal 0.90"),
+        ("5.", r"Direct vs.\ recovered-history TFT", ("0.4999", "0.4690"), "Equal-cost deep subset"),
+        ("7.", r"Short vs.\ full lag set", (), "Not run after the lock"),
+        ("8.", r"Static vs.\ adaptive calibration", ("0.3984", "0.4039"), "Equal-cost sensitivity"),
+        ("9.", r"One-day vs.\ two-day inventory", ("0.3984", "0.2579"), "Hypothetical carry-over"),
+        ("10.", r"Contract vs.\ oracle-weather WAPE", ("33.48%", "33.40%"), "Target-day oracle; not deployable"),
     ]
     lines = [r"\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}Xl>{\raggedright\arraybackslash}p{0.34\linewidth}@{}}",
              r"\toprule", "Recorded diagnostic & Values & Scope" + END, r"\midrule"]

@@ -59,7 +59,7 @@ def main() -> None:
     ]
     OUT.parent.mkdir(parents=True, exist_ok=True)
     with OUT.open("w", newline="", encoding="utf-8") as handle:
-        writer = csv.writer(handle)
+        writer = csv.writer(handle, lineterminator="\n")
         writer.writerow(("metric", "value", "source_file", "method"))
         writer.writerows(rows)
     print(OUT)
