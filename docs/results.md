@@ -48,4 +48,4 @@ results/phase0_9_5k/phase5_9/manifests/final_summary.json
 results/phase0_9_5k/phase5_9/metrics/phase_status_report.csv
 ```
 
-The limitations of these results are discussed in Section VII of the paper ([paper/main.pdf](../paper/main.pdf)).
+The limitations of these results are discussed in Section VI of the paper ([paper/main.pdf](../paper/main.pdf)).
