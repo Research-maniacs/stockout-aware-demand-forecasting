@@ -1,17 +1,25 @@
-\section{Discussion and Conclusion}
+\section{Discussion}
 \label{sec:discussion}
 
-The reversal with the cost ratio follows the direction of the censoring bias. Sales understate demand, which costs little when the order targets a low quantile and much when it targets a high one, so a model trained on recorded sales does well when excess stock is the expensive error and falls behind when shortage is. This qualifies the warning that treating sales as demand degrades as censored data accumulate~\cite{kumar2026value}: here the penalty appears when shortage is costly. The ablations recorded in run~E agree. Averaged over the matched histories at equal costs, the pooled-conformal demand quantiles cost 0.3984 against 0.4075 for the raw-sales point model; the adaptive variant cost 0.4039, so its drift correction did not pay off in this week; a hypothetical two-day carry-over of unsold stock lowers the cost to 0.2579, which shows how much the cost level depends on the one-day shelf life; and target-day weather and promotion values, unknown when the order is placed, change the q50 WAPE only from 33.48\% to 33.40\%.
+The reversal follows the direction of the censoring bias. Sales understate demand, which costs little when the order targets a low quantile and a lot when it targets a high one. A model trained on recorded sales therefore does well when excess stock is the expensive error and falls behind when shortage is. This refines the warning that treating sales as demand degrades as censored data accumulate~\cite{kumar2026value}: in our data the penalty appears when shortage is costly. The ablations recorded in run~E point the same way. Averaged over the matched histories at equal costs, the pooled-conformal demand quantiles cost 0.3984 against 0.4075 for the raw-sales point model. The adaptive variant cost 0.4039, so its drift correction did not pay off in this week. A hypothetical two-day carry-over of unsold stock lowers the cost to 0.2579, which shows how strongly the cost level depends on the one-day shelf life. Giving the model the target-day weather and promotion values, which are not known when the order is placed, changes the q50 WAPE only from 33.48\% to 33.40\%.
 
-\emph{Limitations.} Donor-day sales equal demand only on complete days, which depend on demand and stocking, so the proxy does not identify demand on censored days, where we give only a lower bound. Mechanisms A, B, and C are specified simulations, not counterfactual inventory paths, so transfer results measure sensitivity to these histories, not transport to another retailer. Kaplan--Meier scores only estimable rows, and the neural policies are budget-limited references on 600 series. Rankings depend on the locked cost ratios and the one-day shelf life, and one evaluated week cannot show seasonal effects; any later protocol evaluated on it is exploratory, while the 45,000 series outside run~E's sample have never been scored. The intervals use only 200 replicates. No run hashed the notebook source it executed, and the upstream dataset revision and download date are unknown, so the local file hashes are the operative identifiers. All runs used Linux, Python 3.11.15, two logical CPUs, and 8.42~GB of RAM, run~E without a GPU.
+\emph{Limitations.} Donor-day sales equal demand only on complete days, and whether a day is complete depends on both demand and stocking. The proxy therefore does not identify demand on censored days, where we give only a lower bound. Mechanisms A, B, and C are specified simulations rather than counterfactual inventory paths, so the transfer results measure sensitivity to these histories, not transport to another retailer. Kaplan--Meier is scored only on estimable rows, and the neural policies are budget-limited references on 600 series. The rankings depend on the locked cost ratios and the one-day shelf life, and one evaluated week cannot show seasonal effects. Any later protocol evaluated on this week would be exploratory, although the 45,000 series outside run~E's sample have never been scored. The intervals use only 200 replicates. Finally, no run hashed the notebook source it executed, and the upstream dataset revision and download date are unknown, so the local file hashes are what identify the data. All runs used Linux, Python 3.11.15, two logical CPUs, and 8.42~GB of RAM; run~E had no GPU.
 
-\emph{Conclusion.} A matched donor-proxy design makes stockout-aware forecasting and ordering comparisons on FreshRetailNet-50K checkable: models trained on differently censored histories are scored against the same outcomes, under a protocol fixed before the final week was read. Calibrated demand quantiles gave the lowest cost in every train/test cell when shortage was more costly, and a raw-sales point model with residual quantiles did so when excess stock was more costly. Evaluating the calibrated policy on an unseen mechanism raised its cost by at most 0.0472 normalized units. These findings hold for donor days, the simulated mechanisms, and the locked cost settings; testing them on censored demand requires a new protocol, and testing them on the 45,000 unscored series requires only a new lock.
+\section{Conclusion}
+\label{sec:conclusion}
+
+Scoring forecasts and orders against donor days makes stockout-aware comparisons on FreshRetailNet-50K testable: models trained on differently censored histories are judged on the same outcomes, under a protocol fixed before the final week was read. Calibrated demand quantiles gave the lowest cost in every train/test cell when shortage was more costly, and a raw-sales point model with residual quantiles did so when excess stock was more costly. Moving the calibrated policy to an unseen mechanism raised its cost by at most 0.0472 normalized units. These findings hold for donor days, the simulated mechanisms, and the locked cost settings. Testing them on censored demand would need a new protocol; testing them on the 45,000 unscored series needs only a new lock.
 
 \section*{Code and Data Availability}
 \label{sec:availability}
 
-The notebooks, the saved run outputs, and scripts that regenerate every table and figure without retraining accompany this work; run~E's locked protocol is in \path{manifests/final_test_lock.json}. The dataset is not redistributed; it is available from Hugging Face~\cite{dingdong2025datasetcard} under CC BY 4.0. The SHA-256 hashes of the local files and the digest of run~E's locked protocol are:
-\begin{flushleft}\footnotesize\ttfamily
+The notebooks, the saved run outputs, and the scripts that regenerate every table and figure without retraining are released with this paper. Run~E's locked protocol is in \path{manifests/final_test_lock.json}. The dataset is not redistributed; it is available from Hugging Face~\cite{dingdong2025datasetcard} under CC BY 4.0.
+
+% Kept in one box so the hashes never separate from the sentence that introduces them.
+\noindent\begin{minipage}{\columnwidth}
+\setlength{\parindent}{1em}\indent The SHA-256 hashes of the local files and the digest of run~E's locked protocol are:
+\par\smallskip
+{\footnotesize\ttfamily
 \begin{tabular}{@{}l@{\quad}l@{}}
 train.parquet & 6706832db892bbae4969c19d87e07975\\
               & d2543d2ba7d7d4756360654785de5a3d\\
@@ -19,5 +27,5 @@ eval.parquet  & 1b118840664280c6b88bffc84c80ee1f\\
               & 54c05d911e354b7599e5da10995e960e\\
 lock digest   & 4ab12c4bddc06b4bb32ba8825353071b\\
               & 964ef5bfdd423bd4c876ac382180c1b6
-\end{tabular}
-\end{flushleft}
+\end{tabular}}
+\end{minipage}

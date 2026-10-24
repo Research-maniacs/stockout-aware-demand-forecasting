@@ -18,6 +18,9 @@
 \usepackage{xcolor}
 \usepackage{url}
 
+% At most one full-width table at the top of a page, so the tables never stack on one page.
+\setcounter{dbltopnumber}{1}
+
 \newcommand{\todo}[1]{\textcolor{red}{\textbf{TODO: #1}}}
 \newcommand{\Dproxy}{D^{\mathrm{proxy}}}
 \newcommand{\Sr}{S_{\mathrm{rec}}}
@@ -38,7 +41,7 @@
 % \IEEEpubidadjcol
 
 \begin{abstract}
-Recorded sales understate demand whenever a product sells out, so forecasts and orders fitted to sales inherit the stocking policy. We study demand forecasting and newsvendor ordering on FreshRetailNet-50K, a fresh-retail panel with hourly stockout flags, where days without a flagged stockout give an exact, though selected, demand proxy. Three simulated stockout mechanisms censor these days, so models trained on differently censored histories are scored against the same uncensored outcomes on identical rows. In a 5,000-series run locked before the final week was scored, we compare nine ordering policies under three cost ratios; none wins under every ratio. When a shortage costs three times as much as a leftover unit, LightGBM demand quantiles with pooled conformal calibration are the cheapest full-sample policy in all nine train/test cells; when leftovers cost more, a raw-sales LightGBM with residual quantiles is cheapest in all nine. Training on a different mechanism raises the calibrated policy's mean cost by at most 0.0472 normalized units (95\% cluster-bootstrap interval 0.0391--0.0554), the smallest worst case among the policies that read the evaluation history. For real censored days, where demand is unobserved, we report only a lower bound on misses of the 90\% quantile forecast.
+Recorded sales understate demand whenever a product sells out, so forecasts and orders fitted to sales inherit the stocking policy. We study demand forecasting and newsvendor ordering on FreshRetailNet-50K, a fresh-retail panel with hourly stockout flags. On days without a flagged stockout, recorded sales give an exact, though selected, proxy for demand. We censor these days with three simulated stockout mechanisms, so that models trained on differently censored histories can be scored against the same uncensored outcomes. In a 5,000-series run whose protocol was locked before the final week was scored, we compare nine ordering policies under three cost ratios, and no policy wins under all of them. When a shortage costs three times as much as a leftover unit, LightGBM demand quantiles with pooled conformal calibration are the cheapest full-sample policy in all nine train/test cells; when leftovers cost more, a raw-sales LightGBM with residual quantiles is cheapest in all nine. Training on a different mechanism raises the calibrated policy's mean cost by at most 0.0472 normalized units (95\% cluster-bootstrap interval 0.0391--0.0554), the smallest worst case among the policies that read the evaluation history. For real censored days, where demand is unobserved, we report only a lower bound on misses of the 90\% quantile forecast.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -53,7 +56,7 @@ censored demand, stockouts, demand forecasting, quantile regression, conformal c
 \input{sections/discussion}
 
 % Balances the two columns on the last page; re-check the number after any edit above.
-\IEEEtriggeratref{17}
+\IEEEtriggeratref{14}
 \bibliographystyle{IEEEtran}
 \bibliography{references}
 

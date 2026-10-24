@@ -1,6 +1,13 @@
 \section{Development Runs and Model Training}
 \label{sec:scale}
 
-Run~S searched hyperparameters fully on 5,000 series; run~P used a reduced search on all 50,000 series. Their overall donor shares are almost equal (0.5580 and 0.5573), and their simulator summaries agree to within 0.001: the masked share of eligible donor days is 0.460, 0.566, and 0.832 for A, B, and C in run~S. Run~P has a lower q50 tuning WAPE (0.3124--0.3161 against 0.3334--0.3361 over the three mechanisms) and a longer runtime, but the runs differ in search mode as well as size, so neither difference can be attributed to scale.
+\begin{table*}[t]
+\centering\footnotesize
+\caption{Pre-Specified Paired Contrasts for the Pooled-Conformal Policy over the Three Matched Histories (Negative Values Favor Pooled Conformal)}
+\label{tab:contrasts}
+\input{tables/paired_contrasts}
+\end{table*}
 
-Run~E did not reuse run~S. It executed its own Phase~0--4 stage, with the full search, in the same kernel as its later phases. Its fingerprints of the selected series, the split, and the three simulator masks equal those of run~S, and so do its donor counts and q50 tuning WAPEs at full stored precision (0.333440, 0.336140, and 0.335759), consistent with a deterministic pipeline; timestamps, pandas versions, and file hashes differ, so we treat the runs as separate evidence. One Phase~0 check of run~E stayed open because it compares fingerprints with an earlier execution in the same output folder, and the first execution has none; the comparison with run~S is the one it would have made. A prerequisite audit then passed 10 checks: it re-derived the simulator masks and feature matrices from the raw panel with exact agreement, verified the hashes of 33 predecessor files, and confirmed that the calibration and final-week days were unused. Run~E's later phases ran in the reduced mode with 200 bootstrap replicates, and all results from here on come from its 5,000 series.
+Run~S searched hyperparameters fully on 5,000 series, while run~P used a reduced search on all 50,000. The two runs have almost the same donor share (0.5580 and 0.5573), and their simulator summaries agree to within 0.001; in run~S, for example, mechanisms A, B, and C mask 0.460, 0.566, and 0.832 of the eligible donor days. Run~P has a lower q50 tuning WAPE (0.3124--0.3161 against 0.3334--0.3361 over the three mechanisms) and took longer to run, but because the runs differ in search mode as well as in size, neither difference can be put down to scale.
+
+Run~E did not reuse run~S. It ran Phases~0--4 again with the full search and reproduced run~S's selected series, split, simulator masks, donor counts, and q50 tuning WAPEs (0.333440, 0.336140, and 0.335759) exactly, as expected from a deterministic pipeline with the same data and seed. Before its later phases, an audit rebuilt the simulator masks and feature matrices from the raw panel, found exact agreement, checked the hashes of 33 saved files, and confirmed that the calibration and final-week days were still unused. Run~E's later phases used 200 bootstrap replicates, and all results from here on come from its 5,000 series.
