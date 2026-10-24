@@ -1,9 +1,10 @@
 \documentclass[conference,a4paper]{IEEEtran}
 % IEEE Xplore accepts PDF 1.4 to 1.7; pin 1.5 when building with pdfLaTeX (IEEE's reference toolchain).
 \ifdefined\pdfminorversion\pdfminorversion=5\fi
-% Camera-ready only: uncomment the next two lines and \IEEEpubidadjcol after \maketitle,
+% Conference mode locks out \thanks; the override lets the affiliation footnote below work.
+\IEEEoverridecommandlockouts
+% Camera-ready only: uncomment the next line and \IEEEpubidadjcol after \maketitle,
 % and replace the placeholder with the copyright line supplied by the conference.
-% \IEEEoverridecommandlockouts
 % \IEEEpubid{\makebox[\columnwidth]{979-8-XXXX-XXXX-X/26/\$31.00~\copyright2026 IEEE\hfill}\hspace{\columnsep}\makebox[\columnwidth]{\hfill}}
 \usepackage{cite}
 \usepackage{amsmath}
@@ -17,9 +18,6 @@
 \usepackage{xcolor}
 \usepackage{url}
 
-% Public repository with the code, saved results, and paper sources.
-\newcommand{\repourl}{\url{https://github.com/Research-maniacs/stockout-aware-demand-forecasting}}
-
 \newcommand{\todo}[1]{\textcolor{red}{\textbf{TODO: #1}}}
 \newcommand{\Dproxy}{D^{\mathrm{proxy}}}
 \newcommand{\Sr}{S_{\mathrm{rec}}}
@@ -28,34 +26,19 @@
 
 \title{Stockout-Aware Demand Forecasting and Newsvendor Ordering on FreshRetailNet-50K}
 
-% All authors share this affiliation; long names are split so four blocks fit in one row.
-\newcommand{\srmaffiliation}{\textit{Dept. of Data Science and}\\
-\textit{Business Systems}\\
-\textit{SRM Institute of Science}\\
-\textit{and Technology}\\
-Chennai, Tamil Nadu, India}
-
-\author{\IEEEauthorblockN{Akshara Kumari}
-\IEEEauthorblockA{\srmaffiliation\\
-{\small aksharakumari1208@gmail.com}}
-\and
-\IEEEauthorblockN{Aman Koley}
-\IEEEauthorblockA{\srmaffiliation\\
-{\small amankoley31530@gmail.com}}
-\and
-\IEEEauthorblockN{Shivam Singh}
-\IEEEauthorblockA{\srmaffiliation\\
-{\small shekhawat419shivam@gmail.com}}
-\and
-\IEEEauthorblockN{G. Premalatha}
-\IEEEauthorblockA{\srmaffiliation\\
-{\small premalag@srmist.edu.in}}}
+% Authors on one line; affiliation and e-mail addresses in a first-page footnote.
+\author{Akshara Kumari$^{1}$, Aman Koley$^{2}$, Shivam Singh$^{3}$, and G. Premalatha$^{4}$%
+\thanks{Akshara Kumari, Aman Koley, Shivam Singh, and G. Premalatha are with the Department of Data Science and Business Systems, SRM Institute of Science and Technology, Chennai, Tamil Nadu, India.}%
+\thanks{$^{1}$Akshara Kumari: \texttt{aksharakumari1208@gmail.com}}%
+\thanks{$^{2}$Aman Koley: \texttt{amankoley31530@gmail.com}}%
+\thanks{$^{3}$Shivam Singh: \texttt{shekhawat419shivam@gmail.com}}%
+\thanks{$^{4}$G. Premalatha: \texttt{premalag@srmist.edu.in}}}
 
 \maketitle
 % \IEEEpubidadjcol
 
 \begin{abstract}
-Recorded sales understate demand whenever a product sells out, so forecasts and orders fitted to sales inherit the stocking policy. We study demand forecasting and newsvendor ordering on FreshRetailNet-50K, a fresh-retail panel with hourly stockout flags. Days without a flagged stockout give an exact, though selected, proxy for demand. We censor these days with three simulated stockout mechanisms and score every forecast and order against the same uncensored outcomes, so models trained on differently censored histories are compared on identical rows. Earlier evaluations on this dataset score demand recovery and forecast accuracy, or profit measured on censored sales; we score ordering cost against an uncensored proxy and measure transfer between censoring mechanisms. In a 5,000-series run locked before the final week was scored, we compare nine ordering policies under three cost ratios; none wins under every ratio. When a shortage costs three times as much as a leftover unit, LightGBM demand quantiles with pooled conformal calibration are the cheapest full-sample policy in all nine train/test cells; when leftovers cost more, a raw-sales LightGBM with residual quantiles is cheapest in all nine. Training on a different mechanism raises the calibrated policy's mean cost by at most 0.0472 normalized units (95\% cluster-bootstrap interval 0.0391--0.0554), the smallest worst case among the policies that read the evaluation history. For real censored days, where demand is unobserved, we report only a lower bound on misses of the 90\% quantile forecast.
+Recorded sales understate demand whenever a product sells out, so forecasts and orders fitted to sales inherit the stocking policy. We study demand forecasting and newsvendor ordering on FreshRetailNet-50K, a fresh-retail panel with hourly stockout flags, where days without a flagged stockout give an exact, though selected, demand proxy. Three simulated stockout mechanisms censor these days, so models trained on differently censored histories are scored against the same uncensored outcomes on identical rows. In a 5,000-series run locked before the final week was scored, we compare nine ordering policies under three cost ratios; none wins under every ratio. When a shortage costs three times as much as a leftover unit, LightGBM demand quantiles with pooled conformal calibration are the cheapest full-sample policy in all nine train/test cells; when leftovers cost more, a raw-sales LightGBM with residual quantiles is cheapest in all nine. Training on a different mechanism raises the calibrated policy's mean cost by at most 0.0472 normalized units (95\% cluster-bootstrap interval 0.0391--0.0554), the smallest worst case among the policies that read the evaluation history. For real censored days, where demand is unobserved, we report only a lower bound on misses of the 90\% quantile forecast.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -69,11 +52,8 @@ censored demand, stockouts, demand forecasting, quantile regression, conformal c
 \input{sections/final_results}
 \input{sections/discussion}
 
-\section*{Acknowledgment}
-\todo{AI-use disclosure required by IEEE (system used, where, and to what extent) and any funding acknowledgments.}
-
 % Balances the two columns on the last page; re-check the number after any edit above.
-\IEEEtriggeratref{8}
+\IEEEtriggeratref{17}
 \bibliographystyle{IEEEtran}
 \bibliography{references}
 
