@@ -1,10 +1,9 @@
 \documentclass[conference,a4paper]{IEEEtran}
 % IEEE Xplore accepts PDF 1.4 to 1.7; pin 1.5 when building with pdfLaTeX (IEEE's reference toolchain).
 \ifdefined\pdfminorversion\pdfminorversion=5\fi
-% Conference mode locks out \thanks; the override lets the affiliation footnote below work.
-\IEEEoverridecommandlockouts
-% Camera-ready only: uncomment the next line and \IEEEpubidadjcol after \maketitle,
+% Camera-ready only: uncomment the next two lines and \IEEEpubidadjcol after \maketitle,
 % and replace the placeholder with the copyright line supplied by the conference.
+% \IEEEoverridecommandlockouts
 % \IEEEpubid{\makebox[\columnwidth]{979-8-XXXX-XXXX-X/26/\$31.00~\copyright2026 IEEE\hfill}\hspace{\columnsep}\makebox[\columnwidth]{\hfill}}
 \usepackage{cite}
 \usepackage{amsmath}
@@ -29,13 +28,11 @@
 
 \title{Stockout-Aware Demand Forecasting and Newsvendor Ordering on FreshRetailNet-50K}
 
-% Authors on one line; affiliation and e-mail addresses in a first-page footnote.
-\author{Akshara Kumari$^{1}$, Aman Koley$^{2}$, Shivam Singh$^{3}$, and G. Premalatha$^{4}$%
-\thanks{Akshara Kumari, Aman Koley, Shivam Singh, and G. Premalatha are with the Department of Data Science and Business Systems, SRM Institute of Science and Technology, Chennai, Tamil Nadu, India.}%
-\thanks{$^{1}$Akshara Kumari: \texttt{aksharakumari1208@gmail.com}}%
-\thanks{$^{2}$Aman Koley: \texttt{amankoley31530@gmail.com}}%
-\thanks{$^{3}$Shivam Singh: \texttt{shekhawat419shivam@gmail.com}}%
-\thanks{$^{4}$G. Premalatha: \texttt{premalag@srmist.edu.in}}}
+% All four authors share one affiliation, so it is printed once under their names.
+\author{\IEEEauthorblockN{Akshara Kumari, Aman Koley, Shivam Singh, and G. Premalatha}
+\IEEEauthorblockA{\textit{Department of Data Science and Business Systems}\\
+\textit{SRM Institute of Science and Technology}, Chennai, Tamil Nadu, India\\
+aksharakumari1208@gmail.com, amankoley31530@gmail.com, shekhawat419shivam@gmail.com, premalag@srmist.edu.in}}
 
 \maketitle
 % \IEEEpubidadjcol
