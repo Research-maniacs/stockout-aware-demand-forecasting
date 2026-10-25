@@ -29,4 +29,4 @@ A series is identified by `(city_id, store_id, product_id)`. The hourly sales an
 technical report (arXiv:2505.16319v5) states 863 SKUs.
 
 The upstream revision and download date of these files were not recorded, so the SHA-256 hashes above identify
-the version used. The dataset card states a CC BY 4.0 license.
+the version used. Run `python scripts/verify_data.py` from the repository root to compare a local copy against them. The dataset card states a CC BY 4.0 license.

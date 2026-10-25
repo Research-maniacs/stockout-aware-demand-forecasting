@@ -31,7 +31,7 @@ conformal calibration, and nine ordering policies under a protocol locked before
 |   |-- tables/, figures/    tables generated from results/ and the schematic figures
 |   |-- references.bib
 |   `-- scripts/             scripts that regenerate the tables and figures
-|-- scripts/                 small data utilities
+|-- scripts/                 data utilities (preview, checksum check)
 `-- docs/results.md          summary of the main results
 ```
 
@@ -53,6 +53,12 @@ were produced with the files below; see [data/README.md](data/README.md) for the
 |---|---:|---|
 | `train.parquet` | 4,500,000 | `6706832db892bbae4969c19d87e07975d2543d2ba7d7d4756360654785de5a3d` |
 | `eval.parquet` | 350,000 | `1b118840664280c6b88bffc84c80ee1f54c05d911e354b7599e5da10995e960e` |
+
+To check that your copy matches (it exits with status 1 on a missing or different file):
+
+```powershell
+python scripts\verify_data.py
+```
 
 ## Running the experiments
 
