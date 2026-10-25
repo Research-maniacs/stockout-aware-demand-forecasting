@@ -32,7 +32,8 @@ conformal calibration, and nine ordering policies under a protocol locked before
 |   |-- references.bib
 |   `-- scripts/             scripts that regenerate the tables and figures
 |-- scripts/                 data utilities (preview, checksum check)
-`-- docs/results.md          summary of the main results
+|-- docs/results.md          summary of the main results
+`-- requirements.txt         notebook packages, pinned to the versions of run E
 ```
 
 ## Getting started
@@ -63,7 +64,12 @@ python scripts\verify_data.py
 ## Running the experiments
 
 The experiments were run with Python 3.11.15 on Linux. The package versions of each run are recorded in
-its `manifests/provenance.json` under `results/`.
+its `manifests/provenance.json` under `results/`, and [requirements.txt](requirements.txt) pins those of run E:
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\python -m pip install -r requirements.txt jupyterlab
+```
 
 The notebooks read their input and output locations from environment variables. For example, to run
 Phases 0-4 on a 5,000-series sample (PowerShell):
